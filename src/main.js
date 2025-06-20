@@ -21,14 +21,14 @@ function calculateBonusByProfit(index, total, seller) {
     // Расчет бонуса от позиции в рейтинге
     switch (index) {
         case 0:
-            return 0.15
+            return 0.15 * seller.profit
         case 1:
         case 2:
-            return 0.10
+            return 0.10 * seller.profit
         case total - 1:
-            return 0.00
+            return 0.00 * seller.profit
         default:
-            return 0.05
+            return 0.05 * seller.profit
     }
 }
 
@@ -100,7 +100,6 @@ function analyzeSalesData(data, options) {
     sellerStats.forEach((seller, index) => {
         // Назначение премий на основе ранжирования
         seller.bonus = calculateBonus(index, sellerStats.length, seller);
-        // Подготовка итоговой коллекции с нужными полями
         seller.top_products = Object.entries(seller.products_sold).map(element => {
             return {
                 sku: element[0],
@@ -109,13 +108,16 @@ function analyzeSalesData(data, options) {
         }).sort((a, b) => b.quantity - a.quantity).slice(0, 10);
     });
 
-    return sellerStats.map(seller => ({
-        seller_id: // Строка, идентификатор продавца
-        name: // Строка, имя продавца
-        revenue: // Число с двумя знаками после точки, выручка продавца
-        profit: // Число с двумя знаками после точки, прибыль продавца
-        sales_count: // Целое число, количество продаж продавца
-        top_products: // Целое число, топ-10 товаров продавца
-        bonus: // Число с двумя знаками после точки, бонус продавца
-    })); 
+    // Подготовка итоговой коллекции с нужными полями
+    return sellerStats.map(seller => {
+        return {
+            id: seller.id,
+            name: seller.name,
+            revenue: +seller.revenue.toFixed(2),
+            profit: +seller.profit.toFixed(2),
+            sales_count: seller.sales_count,
+            top_products: seller.top_products,
+            bonus: +seller.bonus.toFixed(2),
+        }
+    });
 }
